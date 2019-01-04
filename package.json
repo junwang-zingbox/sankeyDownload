@@ -1,0 +1,25 @@
+{
+  "name": "sankeydownload",
+  "version": "1.0.0",
+  "description": "download sankey zip file by given json data",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/junwang-zingbox/sankeyDownload.git"
+  },
+  "author": "Jun Wang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/junwang-zingbox/sankeyDownload/issues"
+  },
+  "homepage": "https://github.com/junwang-zingbox/sankeyDownload#readme",
+  "dependencies": {
+    "jszip": "^3.1.5",
+    "lodash": "^4.17.11",
+    "moment": "^2.23.0",
+    "xlsx": "^0.14.1"
+  }
+}
