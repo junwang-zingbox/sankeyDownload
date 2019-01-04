@@ -6,24 +6,26 @@ var fs = require('fs');
 
 var USAGE = 'USAGE: node downloadSankey.js'
     + '[--dataFile=./sankey-dummy.json]'
-    + '[--pdfFolder=./excel]'
+    + '[--fileDir=./excel]'
     + '[--id=aa:bb:cc:dd:ee]'
     + '[--ip=91.0.0.1]'
     + '[--stime=2018-12-01]'
     + '[--etime=2019-01-01]'
     + '[--direction=inbound]'
-    + '[--name=jun pc'
+    + '[--name=jun pc]'
+    + '[--output=testing.xlsx]'
     ;
 
 var opts = {
     'dataFile': 'sankey-dummy.json',
-    'pdfFolder': './excel',
+    'fileDir': './excel',
     'id': 'aa:bb:cc:dd:ee',
     'ip': '91.0.0.1',
     'stime': '2018-12-01',
     'etime': '2019-01-01',
     'direction': 'inbound',
-    'name': 'jun pc'
+    'name': 'jun pc',
+    'output': 'output'
 };
 
 var downloadFileCache = [];
@@ -230,16 +232,17 @@ function downloadToSpreadSheet(data, direction) {
     var ws = XLSX.utils.json_to_sheet(rows, {header: header})
     wb.Sheets[name] = ws;
 });
-    //function s2ab(s) {
-    //    var buf = new ArrayBuffer(s.length);
-    //    var view = new Uint8Array(buf);
-    //    for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-    //    return buf;
-    //}
-    //var zipblob = s2ab(XLSX.write(wb, {bookType:'xlsx', type:'binary'}));
-    var zipblob = XLSX.write(wb, {bookType:'xlsx', type:'binary'});
+    function s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }
+    var zipblob = s2ab(XLSX.write(wb, {bookType:'xlsx', type:'binary'}));
+    //var zipblob = XLSX.write(wb, {bookType:'xlsx', type:'binary'});
     var fileTime = moment['utc'].call().format('MMMM-DD-YYYYTHH-MM');
-    var fileName = opts.pdfFolder + '/zingbox_sankey_' + fileTime + snapShotMeta.name + '_' + direction + '_traffic.xlsx';
+    //var fileName = opts.pdfFolder + '/zingbox_sankey_' + fileTime + snapShotMeta.name + '_' + direction + '_traffic.xlsx';
+    var fileName = opts.fileDir + '/' + opts.output;
 
 
     //downloadFileCache.push({
@@ -247,11 +250,11 @@ function downloadToSpreadSheet(data, direction) {
     //    content: zipblob
     //});
 
-    if (!fs.existsSync(opts.pdfFolder)){
-        fs.mkdirSync(opts.pdfFolder);
+    if (!fs.existsSync(opts.fileDir)){
+        fs.mkdirSync(opts.fileDir);
     }
 
-    fs.writeFile(fileName, zipblob, function(err){
+    fs.writeFileSync(fileName, zipblob, function(err){
                if (err) throw err;
                 console.log('The file has been saved!');
             });
