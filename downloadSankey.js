@@ -11,7 +11,6 @@ var USAGE = 'USAGE: node downloadSankey.js'
     + '[--ip=91.0.0.1]'
     + '[--stime=2018-12-01]'
     + '[--etime=2019-01-01]'
-    + '[--direction=inbound]'
     + '[--name=jun pc]'
     + '[--output=testing.xlsx]'
     ;
@@ -23,7 +22,6 @@ var opts = {
     'ip': '91.0.0.1',
     'stime': '2018-12-01',
     'etime': '2019-01-01',
-    'direction': 'inbound',
     'name': 'jun pc',
     'output': 'output'
 };
@@ -48,7 +46,7 @@ function readArgs() {
  * @param data
  * @returns {*}
  */
-function downloadToSpreadSheet(data, direction) {
+function downloadToSpreadSheet(data) {
     data = data || {};
     var spreadsheetData = {};
     var network_connectivity = data.network_connectivity || {};
@@ -67,15 +65,14 @@ function downloadToSpreadSheet(data, direction) {
     var metaData = {
         Sheets: [
             {
-                header: ['Device Name', 'IP', 'MAC Address', 'Traffic Start Time', 'Traffic End Time', 'Traffic Direction'],
+                header: ['Device Name', 'IP', 'MAC Address', 'Traffic Start Time', 'Traffic End Time'],
                 arrayFormatData: function(){
                 var ret = [{
                     'Device Name': snapShotMeta.name,
                     'IP': snapShotMeta.ip,
                     'MAC Address': snapShotMeta.id,
                     'Traffic Start Time': snapShotMeta.stime,
-                    'Traffic End Time': snapShotMeta.etime,
-                    'Traffic Direction':snapShotMeta.direction
+                    'Traffic End Time': snapShotMeta.etime
                 }];
     return ret;
 }
@@ -294,7 +291,7 @@ function createXLSXFile() {
     //var zip = new JSZip();
 
     //todo: json file should have 3 direction data
-    downloadToSpreadSheet(dataJson, opts.direction);
+    downloadToSpreadSheet(dataJson);
 
     //directions.forEach(function(direction){
     //    downloadToSpreadSheet(dataJson, direction);
