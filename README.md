@@ -14,3 +14,10 @@ Run `node downloadSankey --dataFile=abc.json`
 
 ## Todo
 *Please see the todo inside of downloadSankey.js for adding extra device info and inbound/outbound/all directions in json data*
+1. more params for device basic info 
+--id, --ip, --stime, --etime, --direction, --name
+
+2. one data json file
+remove zip part.
+
+

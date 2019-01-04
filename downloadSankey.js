@@ -5,23 +5,28 @@ var _ = require('lodash');
 var fs = require('fs');
 
 var USAGE = 'USAGE: node downloadSankey.js'
-    + '[--dataFile=./sankey-dummy.json]';
+    + '[--dataFile=./sankey-dummy.json]'
+    + '[--pdfFolder=./excel]'
+    + '[--id=aa:bb:cc:dd:ee]'
+    + '[--ip=91.0.0.1]'
+    + '[--stime=2018-12-01]'
+    + '[--etime=2019-01-01]'
+    + '[--direction=inbound]'
+    + '[--name=jun pc'
+    ;
 
 var opts = {
-    'dataFile': 'sankey-dummy.json'
+    'dataFile': 'sankey-dummy.json',
+    'pdfFolder': './excel',
+    'id': 'aa:bb:cc:dd:ee',
+    'ip': '91.0.0.1',
+    'stime': '2018-12-01',
+    'etime': '2019-01-01',
+    'direction': 'inbound',
+    'name': 'jun pc'
 };
 
 var downloadFileCache = [];
-
-//todo: add device basic info in json file
-var snapShotMeta = {
-    name: 'testingdevice',
-    id: 'aa:bb:cc:dd:ee',
-    ip: '96.56.0.1',
-    stime: '2018-12-01',
-    etime: '2019-01-01',
-    direction: 'inbound'
-}
 
 /**
  * Read the command line arguments, validate, and map onto the opts object
@@ -54,6 +59,8 @@ function downloadToSpreadSheet(data, direction) {
         SheetNames: ['Device Data', 'All Traffic Data', 'Geo Location to IP and Users', 'IP Users to Applications', 'IP Detail'],
         Sheets: {}
     };
+
+    var snapShotMeta = opts;
 
     var metaData = {
         Sheets: [
@@ -232,85 +239,74 @@ function downloadToSpreadSheet(data, direction) {
     //var zipblob = s2ab(XLSX.write(wb, {bookType:'xlsx', type:'binary'}));
     var zipblob = XLSX.write(wb, {bookType:'xlsx', type:'binary'});
     var fileTime = moment['utc'].call().format('MMMM-DD-YYYYTHH-MM');
-    var fileName = 'zingbox_sankey_' + fileTime + snapShotMeta.name + '_' + direction + '_traffic.xlsx';
+    var fileName = opts.pdfFolder + '/zingbox_sankey_' + fileTime + snapShotMeta.name + '_' + direction + '_traffic.xlsx';
 
 
-    downloadFileCache.push({
-        filename: fileName,
-        content: zipblob
-    });
+    //downloadFileCache.push({
+    //    filename: fileName,
+    //    content: zipblob
+    //});
 
+    if (!fs.existsSync(opts.pdfFolder)){
+        fs.mkdirSync(opts.pdfFolder);
+    }
 
-}
-
-function combineToZip(zip, filename) {
-    downloadFileCache.forEach(function(item){
-        zip.file(item.filename, item.content, {binary: true});
-    })
-
-    zip.generateAsync({type:"nodebuffer"})
-        .then(function(content) {
-            // see FileSaver.js
-            fs.writeFile(filename, content, function(err){
-                if (err) throw err;
+    fs.writeFile(fileName, zipblob, function(err){
+               if (err) throw err;
                 console.log('The file has been saved!');
             });
-        });
+
+
+
+
+
+
 }
+
+//function combineToZip(zip, filename) {
+//    downloadFileCache.forEach(function(item){
+//        zip.file(item.filename, item.content, {binary: true});
+//    })
+//
+//    zip.generateAsync({type:"nodebuffer"})
+//        .then(function(content) {
+//            // see FileSaver.js
+//            fs.writeFile(filename, content, function(err){
+//                if (err) throw err;
+//                console.log('The file has been saved!');
+//            });
+//        });
+//}
 
 
 /**
  * Create one zip file based on one device json file
  */
-function createZipFile() {
+function createXLSXFile() {
     var dataStr = fs.readFileSync(opts.dataFile);
     var dataJson = JSON.parse(dataStr);
-    var timestamp = new Date().getTime();
+    //var timestamp = new Date().getTime();
 
-    var directions = ['inbound','outbound', 'all'];
-    var zip = new JSZip();
+    //var directions = ['inbound','outbound', 'all'];
+    //var zip = new JSZip();
 
     //todo: json file should have 3 direction data
+    downloadToSpreadSheet(dataJson, opts.direction);
 
-    directions.forEach(function(direction){
-        downloadToSpreadSheet(dataJson, direction);
-    })
+    //directions.forEach(function(direction){
+    //    downloadToSpreadSheet(dataJson, direction);
+    //})
 
-    var filename = 'sankey-' + snapShotMeta.name + '-' + timestamp + '.zip';
-
-    combineToZip(zip, filename);
-
-
-
-    //testing
-
-    //zip.file("Hello.txt", "Hello World\n");
-
-// Generate a directory within the Zip file structure
-//    var folder = zip.folder("testingfolder");
-
-// Add a file to the directory, in this case an image with data URI as contents
-//    folder.file("test.json", dataJson);
-//zip.file("abc.txt", "abc\n");
-//// Generate the zip file asynchronously
-//    zip.generateAsync({type:"nodebuffer"})
-//        .then(function(content) {
-//            // Force down of the Zip file
-//            var testFileName = "archive.zip";
-//            fs.writeFile(testFileName, content, function(err){
-//                if (err) throw err;
-//                console.log('The file has been saved!');
-//            });
-//        });
-
-
+    //var filename = 'sankey-' + snapShotMeta.name + '-' + timestamp + '.zip';
+    //
+    //combineToZip(zip, filename);
 
 
 }
 
 
 readArgs();
-createZipFile();
+createXLSXFile();
 
 
 
