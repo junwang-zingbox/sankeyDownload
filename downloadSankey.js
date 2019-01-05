@@ -235,7 +235,11 @@ function downloadToSpreadSheet(data) {
         for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
         return buf;
     }
-    var zipblob = s2ab(XLSX.write(wb, {bookType:'xlsx', type:'binary'}));
+
+    const zipblob = XLSX.write(wb, { type: 'buffer', bookSST: true, bookType: 'xlsx' });
+
+    //var zipblob = s2ab(XLSX.write(wb, {bookType:'xlsx', type:'binary'}));
+    //var zipblob = s2ab(XLSX.write(wb, {bookType:'xlsx', type:'buffer'}));
     //var zipblob = XLSX.write(wb, {bookType:'xlsx', type:'binary'});
     var fileTime = moment['utc'].call().format('MMMM-DD-YYYYTHH-MM');
     //var fileName = opts.pdfFolder + '/zingbox_sankey_' + fileTime + snapShotMeta.name + '_' + direction + '_traffic.xlsx';
